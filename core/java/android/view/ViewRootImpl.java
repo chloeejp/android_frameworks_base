@@ -1242,6 +1242,11 @@ public final class ViewRootImpl implements ViewParent,
 
     private final boolean mIsSubscribeGranularDisplayEventsEnabled;
 
+    private final float[] mScrollFilterDownX = new float[32];
+    private final float[] mScrollFilterDownY = new float[32];
+    private boolean mScrollFilterHasMoved;
+    private static final String TARGET_DEVICE_NAME = "touch_keypad";
+
     public ViewRootImpl(Context context, Display display) {
         this(context, display, WindowManagerGlobal.getWindowSession(), new WindowLayout());
     }
@@ -10523,23 +10528,50 @@ public final class ViewRootImpl implements ViewParent,
 
         @Override
         public void onInputEvent(InputEvent event) {
+            if (event instanceof MotionEvent) {
+                MotionEvent me = (MotionEvent) event;
+                InputDevice device = event.getDevice();
+
+                if (device == null) {
+                    device = android.hardware.input.InputManagerGlobal.getInstance()
+                    .getInputDevice(me.getDeviceId());
+                }
+
+                if (device != null && TARGET_DEVICE_NAME.equals(device.getName())) {
+                    int action = me.getActionMasked();
+
+                    if (me.getPointerCount() > 1) {
+                        me.setAction(MotionEvent.ACTION_CANCEL);
+                    } else {
+                        if (action == MotionEvent.ACTION_DOWN) {
+                            mScrollFilterHasMoved = false;
+
+                        } else if (action == MotionEvent.ACTION_MOVE) {
+
+                        } else if (action == MotionEvent.ACTION_UP) {
+                            me.setAction(MotionEvent.ACTION_CANCEL);
+                        }
+                    }
+                }
+            }
+
             Trace.traceBegin(Trace.TRACE_TAG_VIEW, "processInputEventForCompatibility");
             List<InputEvent> processedEvents;
             try {
                 processedEvents =
-                    mInputCompatProcessor.processInputEventForCompatibility(event);
+                mInputCompatProcessor.processInputEventForCompatibility(event);
             } finally {
                 Trace.traceEnd(Trace.TRACE_TAG_VIEW);
             }
+
             if (processedEvents != null) {
                 if (processedEvents.isEmpty()) {
-                    // InputEvent consumed by mInputCompatProcessor
                     finishInputEvent(event, true);
                 } else {
                     for (int i = 0; i < processedEvents.size(); i++) {
                         enqueueInputEvent(
-                                processedEvents.get(i), this,
-                                QueuedInputEvent.FLAG_MODIFIED_FOR_COMPATIBILITY, true);
+                            processedEvents.get(i), this,
+                                          QueuedInputEvent.FLAG_MODIFIED_FOR_COMPATIBILITY, true);
                     }
                 }
             } else {
