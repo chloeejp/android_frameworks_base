@@ -513,7 +513,6 @@ android_library {
         "androidx.compose.animation_animation-graphics",
         "androidx.lifecycle_lifecycle-viewmodel-compose",
         "vendor.lineage.powershare-V1-java",
-        "vendor.blackberry.touchkeypad-V1-java",
     ],
     libs: [
         "keepanno-annotations",
@@ -697,7 +696,6 @@ android_library {
         "TraceurCommon",
         "Traceur-res",
         "vendor.lineage.powershare-V1-java",
-        "vendor.blackberry.touchkeypad-V1-java",
     ],
 }
 
