@@ -18062,9 +18062,6 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         final int viewFlags = mViewFlags;
         final int action = event.getAction();
 
-        InputDevice device = event.getDevice();
-        final boolean isScrollOnlyDevice = (device != null && "touch_keypad".equals(device.getName()));
-
         final boolean clickable = ((viewFlags & CLICKABLE) == CLICKABLE
                 || (viewFlags & LONG_CLICKABLE) == LONG_CLICKABLE)
                 || (viewFlags & CONTEXT_CLICKABLE) == CONTEXT_CLICKABLE;
@@ -18158,7 +18155,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                     }
                     mHasPerformedLongPress = false;
 
-                    if (!clickable && !isScrollOnlyDevice) {
+                    if (!clickable) {
                         checkForLongClick(
                                 ViewConfiguration.getLongPressTimeout(),
                                 x,
@@ -18187,14 +18184,11 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                     } else {
                         // Not inside a scrolling container, so show the feedback right away
                         setPressed(true, x, y);
-
-                        if (!isScrollOnlyDevice) {
-                            checkForLongClick(
-                                    ViewConfiguration.getLongPressTimeout(),
-                                    x,
-                                    y,
+                        checkForLongClick(
+                                ViewConfiguration.getLongPressTimeout(),
+                                x,
+                                y,
                                 TOUCH_GESTURE_CLASSIFIED__CLASSIFICATION__LONG_PRESS);
-                        }
                     }
                     break;
 
@@ -18229,13 +18223,11 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                                     * mAmbiguousGestureMultiplier);
                             // Subtract the time already spent
                             delay -= event.getEventTime() - event.getDownTime();
-                            if (!isScrollOnlyDevice) {
-                                checkForLongClick(
-                                        delay,
-                                        x,
-                                        y,
-                                        TOUCH_GESTURE_CLASSIFIED__CLASSIFICATION__LONG_PRESS);
-                            }
+                            checkForLongClick(
+                                    delay,
+                                    x,
+                                    y,
+                                    TOUCH_GESTURE_CLASSIFIED__CLASSIFICATION__LONG_PRESS);
                         }
                         touchSlop *= mAmbiguousGestureMultiplier;
                     }
@@ -18257,13 +18249,11 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                     if (deepPress && hasPendingLongPressCallback()) {
                         // process the long click action immediately
                         removeLongPressCallback();
-                        if (!isScrollOnlyDevice) {
-                            checkForLongClick(
-                                    0 /* send immediately */,
-                                    x,
-                                    y,
-                                    TOUCH_GESTURE_CLASSIFIED__CLASSIFICATION__DEEP_PRESS);
-                        }
+                        checkForLongClick(
+                                0 /* send immediately */,
+                                x,
+                                y,
+                                TOUCH_GESTURE_CLASSIFIED__CLASSIFICATION__DEEP_PRESS);
                     }
 
                     break;
