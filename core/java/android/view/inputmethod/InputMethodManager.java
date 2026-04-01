@@ -4287,8 +4287,7 @@ public final class InputMethodManager {
             if (isImeSessionAvailableLocked()) {
                 if (event instanceof KeyEvent) {
                     KeyEvent keyEvent = (KeyEvent)event;
-                    if (keyEvent.getAction() == KeyEvent.ACTION_DOWN
-                            && keyEvent.getRepeatCount() == 0) {
+                    if (keyEvent.getRepeatCount() == 0) {
                         int mode = Settings.Secure.getInt(
                                 mCurRootView.mContext.getContentResolver(),
                                 Settings.Secure.IME_SWITCHER_SHORTCUT, 0);
@@ -4312,7 +4311,9 @@ public final class InputMethodManager {
                                 break;
                         }
                         if (isImeSwitchKey) {
-                            showInputMethodPickerLocked();
+                            if (keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
+                                showInputMethodPickerLocked();
+                            }
                             return DISPATCH_HANDLED;
                         }
                     }
